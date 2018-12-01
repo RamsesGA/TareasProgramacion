@@ -1,5 +1,5 @@
 from os import path
-import time
+
 
 #Clase para poder almacenar datos de cada niño, imprimir los datos correctos de esté.
 class Alumnos():
@@ -13,7 +13,6 @@ class Alumnos():
        return transformacion
    def imprimir(self):
        print("Nombre: ", self.nombre, " Promedio: ", self.cali, " Grado y grupo: ", self.gradoGrupo)
-
 #Clase para asignar el grupo especifico que se recibe y los datos de todos los niños.
 class GruposAlumnos():
     def __init__(self, NombreGrupo):
@@ -22,34 +21,55 @@ class GruposAlumnos():
     #Función para poder crear el archivo de texto.
     def nameGrupo(self):
         return self.elGrupo + ".txt"     
-
 #Función para poder checar si el grupo existe o no.
 def checkGroup(allGroups, futureGroups):
     for x in allGroups:
         if x.elGrupo == futureGroups:
             return 1
     return -1
-
 #Función para poder imprimir todos los alumnos.
 def imprimirDefinitivo(listNiños):
     for x in listNiños:
         for i in x.battleRoyal:
             i.imprimir()
-
 #Función para poder organizar por calificación
 def ordenCali(long):
-    num1 = 0
-    num2 = 0
-    numLong = 0
-    for x in long:
-        for i in range(0, len(long) - 1):
-            if i + 1 < len(long) - 1:
-                if x.battleRoyal[i].cali > x.battleRoyal[i + 1].cali:
-                    num1 = x.battleRoyal[i]
-                    x.battleRoyal[i] = x.battleRoyal[i + 1]
-                    x.battleRoyal[i + 1] = num1
-    print(x.battleRoyal)
+        numMayor = 0
+        reserva = 0
+        for x in long:
+            for i in range(0, len(x.battleRoyal) - 1):
+                numMayor = float(x.battleRoyal[i].cali)
+                reserva = i
+                for j in range(i + 1, len(x.battleRoyal)):
+                    if (float(x.battleRoyal[j].cali) < numMayor):
+                        numMayor = float(x.battleRoyal[j].cali)
+                        reserva = j
+                x.battleRoyal[reserva], x.battleRoyal[i] = x.battleRoyal[i], x.battleRoyal[reserva]
+        imprimirDefinitivo(long)
+        for k in long:
+            with open(k.nameGrupo(), 'w') as arch:
+                for l in k.battleRoyal:
+                    arch.write(l.string())
 
+#Función para poder ordenar por abecedario.
+def abecedario(long2):
+    wordMayor = 0
+    reserva = 0
+    for x in long2:
+        for i in range(0, len(x.battleRoyal) - 1):
+            wordMayor = x.battleRoyal[i].nombre
+            reserva = i
+            for j in range(i + 1, len(x.battleRoyal)):
+                if (x.battleRoyal[j].nombre < wordMayor):
+                    wordMayor = x.battleRoyal[j].nombre
+                    reserva = j
+            x.battleRoyal[reserva], x.battleRoyal[i] = x.battleRoyal[i], x.battleRoyal[reserva]
+    imprimirDefinitivo(long2)
+    for k in long2:
+            with open(k.nameGrupo(), 'w') as arch:
+                for l in k.battleRoyal:
+                    arch.write(l.string())
+#
 def main():
     print("Ingresa\n0-Salir\n1-Iniciar el programa\n")
     valor = str(input())
@@ -65,14 +85,13 @@ def main():
     else:
         print("- - - - - -Valor no permitido- - - - - ")
         return main()
-
+#
 def principal():
     x = 0
     parametro = None
     listAllKids = []
     strNewBoy = ""
     verify = path.isfile("alumnos.txt")
-
     if verify:        
         #Darle los valores del archivo a una variable.
         with open('alumnos.txt') as archivoAlumnos:
@@ -95,7 +114,7 @@ def principal():
                     GrupitoNuevo = GruposAlumnos(parametro.gradoGrupo)
                     #le damos un valor a battleRoyal de 1 alumno completo.
                     GrupitoNuevo.battleRoyal.append(parametro)
-                    #Está variable tendra todos los niños, paso por paso.
+                    #Está variable tendra todos los niños, paso por paso.y
                     listAllKids.append(GrupitoNuevo)
                 lineaArchivo = archivoAlumnos.readline()
                 #F I N.
@@ -107,7 +126,7 @@ def principal():
                     arch.write(i.string())
     else:
         print("Error, archivo no encontrado, se recomienda ingresarlo")
-
+    #Inicia la interfaz uwu.
     print("Ingresa\n0-Salir\n1-Ingresar un nuevo alummno\n2-Ver todos los alumnos\n3-Ordenar numericamente\n4-Ordenar por alfabeto\n")
     valor = str(input())
     #Valores para el menu.
@@ -120,28 +139,55 @@ def principal():
             print("Ingresa un nuevo alummno con sus siguientes datos...")
             print("Nombre: ")
             niño = str(input())
-            print("Calificación: ")
-            califi = str(input())
-            print("Año y grupo")
-            AG = str(input())
-            strNewBoy = (niño + ' ' + califi + ' ' + AG)
-            strNewBoy = strNewBoy.split()
+            niño = niño.capitalize()
+            if niño.isalpha() == True:
+                print("Calificación: ")
+                califi = input()
+                try:
+                    califi = float(califi)
+                    print("Año: ")
+                    A = str(input())
+                    if A.isdecimal() == True:
+                        print("Ingresa la letra del grupo")
+                        G = str(input())
+                        if G.isalpha() == True:
+                            G = G.upper()
+                            califi = str(califi)
+                            strNewBoy = (niño + ' ' + califi + ' ' + A + G)
+                            with open("alumnos.txt", 'a') as niñoNew:
+                                niñoNew.write('\n')
+                                niñoNew.write(strNewBoy)
+                        else:
+                            print("Valor incorrecto\n")
+                            principal()
+                    else:
+                        print("Valor incorrecto\n")
+                        principal
+                except:
+                    print("Valor incorrecto\n")
+                    principal()
+            else:
+                print("Valor incorrecto\n")
+                principal()
         elif valor == 2:
-            print("Listas completas")
+            print("---------Listas completas---------")
             imprimirDefinitivo(listAllKids)
-            print("Lista total terminada")
+            print("---------Lista total terminada---------\n")
+            principal()
         elif valor == 3:          
-            print("Lista ordenandose numericamente...")
+            print("----------Listas ordenadas numericamente--------")
             ordenCali(listAllKids)
-            print("Lista terminada")
+            print("---------Lista total terminada---------\n")
+            principal()
         elif valor == 4:
-            print("Lista ordenandose alfabeticamente...")
-            ordenCali(listAllKids)
-            print("Lista terminada")
+            print("---------Listas ordenadas alfabeticamente----------")
+            abecedario(listAllKids)
+            print("---------Lista total terminada---------\n")
+            principal()
         elif valor >= 5:
-            print("Valor fuera de rango")
-            return principal()
+            print("---------Valor fuera de rango---------\n")
+            principal()
     else:
-        print("Ingresa un valor correcto")
+        print("---------Ingresa un valor correcto----------\n")
         return principal()
 main()
